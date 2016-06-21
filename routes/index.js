@@ -16,9 +16,9 @@ router.get('/scrape', function(req, res){
     url = 'http://www.yelp.com/biz/wurstk%C3%BCche-los-angeles-2?start=';
     var jsonArray = [];
 
-    for (var i = 0; i <= 1000; i+=20) {
-      createRequest(url, i, jsonArray)
-    }
+    // for (var i = 0; i <= 0; i+=20) {
+      createRequest(url, 0, jsonArray, res)
+    // }
     // The structure of our request call
     // The first parameter is our URL
     // The callback function takes 3 parameters, an error, response status code and the html
@@ -68,14 +68,17 @@ router.get('/scrape', function(req, res){
     // })
 })
 
-function createRequest(url, n, jsonArray) {
+function createRequest(url, n, jsonArray, res) {
+  console.log('createRequest');
   request(url + n, function(error, response, html){
       // First we'll check to make sure no errors occurred when making the request
 
     if(!error){
+      console.log('not error');
       // Next, we'll utilize the cheerio library on the returned html which will essentially give us jQuery functionality
 
       var $ = cheerio.load(html);
+
 
       // Finally, we'll define the variables we're going to capture
 
@@ -98,15 +101,17 @@ function createRequest(url, n, jsonArray) {
           json.review = review
 
           jsonArray.push(json);
+          console.log(json);
       })
     }
 
-    if (n >= 1000) {
+    // if (n >= 1000) {
       fs.writeFile('output.json', JSON.stringify(jsonArray, null, 4), function(err) {
 
         console.log('File successfully written!');
+        res.render('index', {title: JSON.stringify(jsonArray)});
       })
-    }
+    // }
 
   })
 }
